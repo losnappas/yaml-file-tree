@@ -1,0 +1,18 @@
+[project]
+name = "yaml_file_tree"
+version = "1.0.0"
+description = "File structure as yaml file"
+authors = [{name ="losnappas", email = "hanu6@hotmail.com"}]
+license = {file = "LICENSE.md"}
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = [
+]
+
+[project.scripts]
+yaml-file-tree = "yaml_file_tree:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

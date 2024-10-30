@@ -1,0 +1,6 @@
+.direnv
+.devenv
+.venv
+result
+__pycache__
+*.egg-info
