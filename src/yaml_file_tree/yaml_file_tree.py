@@ -17,7 +17,7 @@ def group_sorted_files_by_directory(paths):
         else:
             # Recursively process the rest of the path
             sub_paths = [p[len(key)+1:] for p in group if '/' in p]
-            tree.insert(0, [key, group_sorted_files_by_directory(sub_paths)])
+            tree.append([key, group_sorted_files_by_directory(sub_paths)])
 
     return tree
 
@@ -49,7 +49,7 @@ type_icon_map = {"folder": "📁", "file": "📄"}
 def build_tree(tree, indent=0, indent_per_level=4):
     tree_str = ""
     # Tabs are not valid indent in yaml, unfortunately.
-    spaces = " " * indent_per_level
+    spaces = " " * indent_per_level * indent
     for part in tree:
         tree_str += spaces
         if isinstance(part, str):
@@ -66,6 +66,10 @@ def print_file_tree(path = "."):
     nested_tree = group_sorted_files_by_directory(repo)
 
     print(build_tree(nested_tree))
+
+def print_file_name(line_number, path = "."):
+    repo = map_contents(path, additional_ignores=['.jj', '.hg'])
+    print(repo[line_number-1])
 
 if __name__ == '__main__':
     print_file_tree()

@@ -28,8 +28,13 @@
           inputs',
           pkgs,
           system,
+          lib,
           ...
         }:
+        let
+          name = "yaml-file-tree";
+          version = "1.0.0";
+        in
         {
 
           # Per-system attributes can be defined here. The self' and inputs'
@@ -37,7 +42,7 @@
           # system.
 
           devenv.shells.default = {
-            name = "my-project";
+            inherit name;
 
             # https://devenv.sh/reference/options/
             languages.nix.enable = true;
@@ -60,11 +65,34 @@
 
           # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
           packages.default = pkgs.python3Packages.buildPythonApplication {
-              pname = "yaml-file-tree";
-              version = "1.0.0";
-              src = ./.;
-              format = "pyproject";
-              buildInputs = [ pkgs.python3Packages.setuptools pkgs.python3Packages.wheel ];
+            inherit version;
+            pname = name;
+            src = ./.;
+            format = "pyproject";
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+            buildInputs = [
+              pkgs.python3Packages.setuptools
+              pkgs.python3Packages.wheel
+            ];
+            postInstall = ''
+              wrapProgram "$out/bin/yaml-file-tree" --set PATH ${lib.makeBinPath [ pkgs.fd ]}
+            '';
+          };
+
+          packages.kak-yaml-file-tree = pkgs.kakouneUtils.buildKakounePluginFrom2Nix {
+            inherit version;
+            pname = name;
+            src = ./.;
+            buildInputs = [
+                self'.packages.default
+            ];
+            preInstall = ''
+            {
+            echo "hook global ModuleLoaded yaml-file-tree %{"
+              echo "set-option global yaml_file_tree_exec ${self'.packages.default}/bin/yaml-file-tree"
+            echo "}"
+            } > rc/yaml-file-tree-nix.kak
+            '';
           };
         };
       flake = {
